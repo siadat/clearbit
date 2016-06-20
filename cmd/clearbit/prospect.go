@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/codegangsta/cli"
 	"github.com/thoughtbot/clearbit"
+	"regexp"
 )
 
 var prospectCommand = cli.Command{
@@ -27,8 +28,14 @@ func prospect(ctx *cli.Context) error {
 		name      = ctx.String("name")
 		role      = ctx.String("role")
 		seniority = ctx.String("seniority")
-		titles    = ctx.StringSlice("title")
+		titlesCSV = ctx.StringSlice("title")
+		titles    []string
+		separator = regexp.MustCompile("\\s*,\\s*")
 	)
+
+	for _, title := range titlesCSV {
+		titles = append(titles, separator.Split(title, -1)...)
+	}
 
 	if domain == "" {
 		return requiredArgError("Usage: clearbit prospect <domain>")
